@@ -43,12 +43,7 @@ namespace ScapeCore.Core.Engine
             gameObject = new(this);
         }
 
-        public MonoBehaviour(params Behaviour[] behaviours) : base(nameof(MonoBehaviour))
-        {
-            var l = behaviours.ToList();
-            l.Add(this);
-            gameObject = new(l.ToArray());
-        }
+        public MonoBehaviour(StartBatchEventHandler start, UpdateBatchEventHandler update, params Behaviour[] behaviours) : this(start, update) => gameObject!.AddBehaviours(behaviours);
 
         public static T? Clone<T>(T monoBehaviour) where T : MonoBehaviour => DeepCopyObjectExtensions.DeepCopy(monoBehaviour);
 

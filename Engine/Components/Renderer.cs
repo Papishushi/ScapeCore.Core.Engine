@@ -28,26 +28,28 @@ namespace ScapeCore.Core.Engine.Components
     {
         public Texture2D? texture;
         private GameTime? _time;
-        protected GraphicsDevice _device;
-        protected RenderBatchEventHandler _renderEvent;
+        public GraphicsDevice? device;
+        protected RenderBatchEventHandler? _renderEvent;
         public GameTime? Time { get => _time; }
 
+        public Renderer() : base(nameof(Renderer)) { }
+        protected Renderer(string name) : base(name) { }
         public Renderer(RenderBatchEventHandler render, GraphicsDevice device) : base(nameof(Renderer))
         {
             _renderEvent = render;
-            _device = device;
+            this.device = device;
             texture = null;
         }
         public Renderer(RenderBatchEventHandler render, GraphicsDevice device, Texture2D texture) : base(nameof(Renderer))
         {
             _renderEvent = render;
-            _device = device;
+            this.device = device;
             this.texture = texture;
         }
         protected Renderer(RenderBatchEventHandler render, GraphicsDevice device, StringBuilder name) : base(name.ToString())
         {
             _renderEvent = render;
-            _device = device;
+            this.device = device;
             texture = null;
         }
 
@@ -57,6 +59,7 @@ namespace ScapeCore.Core.Engine.Components
         {
             base.OnDestroy();
             texture = null;
+            device = null;
             _time = null;
             _renderEvent -= RenderWrapper;
         }

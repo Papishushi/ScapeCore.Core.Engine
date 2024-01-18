@@ -28,11 +28,12 @@ namespace ScapeCore.Core.Engine.Components
         public RectTransform rtransform;
         public SpriteEffects spriteEffects;
         public float depth;
-        private SpriteBatch _spriteBatch;
+        public SpriteBatch? spriteBatch;
 
+        public SpriteRenderer() : base(nameof(SpriteRenderer)) { }
         public SpriteRenderer(SpriteBatch spriteBatch, RenderBatchEventHandler render, GraphicsDevice device) : base(render, device, new StringBuilder(nameof(SpriteRenderer)))
         {
-            _spriteBatch = spriteBatch;
+            this.spriteBatch = spriteBatch;
             rtransform = new();
             depth = 0f;
         }
@@ -42,17 +43,17 @@ namespace ScapeCore.Core.Engine.Components
             var center = Point.Zero;
             rtransform = new RectTransform(size, center, Vector2.Zero, Vector2.Zero, Vector2.One);
             depth = 0f;
-            _spriteBatch = spriteBatch;
+            this.spriteBatch = spriteBatch;
         }
         public SpriteRenderer(SpriteBatch spriteBatch, RenderBatchEventHandler render, GraphicsDevice device, Texture2D texture, RectTransform rtransform, SpriteEffects spriteEffects, float depth) : base(render, device, texture)
         {
             this.rtransform = rtransform;
             this.spriteEffects = spriteEffects;
             this.depth = depth;
-            _spriteBatch = spriteBatch;
+            this.spriteBatch = spriteBatch;
         }
 
-        protected override void Render() => _spriteBatch.Draw(texture ?? new(_device, texture!.Width, texture!.Height),
+        protected override void Render() => spriteBatch.Draw(texture ?? new(device, texture!.Width, texture!.Height),
                                                                 transform?.Position ?? Vector2.Zero,
                                                                 rtransform?.Rectangle ?? new Rectangle(Point.Zero, new(100, 100)),
                                                                 Color.White,
