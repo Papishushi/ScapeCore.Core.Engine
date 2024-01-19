@@ -30,17 +30,19 @@ namespace ScapeCore.Core.Engine
     {
         private bool _started = false;
         private GameTime? _time;
-        private StartBatchEventHandler _startEvent;
-        private UpdateBatchEventHandler _updateEvent;
+        protected StartBatchEventHandler? _startEvent;
+        protected UpdateBatchEventHandler? _updateEvent;
         public GameTime? Time { get => _time; }
         public GameObject? gameObject { get; set; }
         public Transform? transform { get => gameObject?.transform; }
 
-        public MonoBehaviour(StartBatchEventHandler start, UpdateBatchEventHandler update) : base(nameof(MonoBehaviour))
+
+        public MonoBehaviour() : base(nameof(MonoBehaviour)) => gameObject = new(this);
+
+        public MonoBehaviour(StartBatchEventHandler start, UpdateBatchEventHandler update) : this()
         {
             _startEvent = start;
             _updateEvent = update;
-            gameObject = new(this);
         }
 
         public MonoBehaviour(StartBatchEventHandler start, UpdateBatchEventHandler update, params Behaviour[] behaviours) : this(start, update) => gameObject!.AddBehaviours(behaviours);
