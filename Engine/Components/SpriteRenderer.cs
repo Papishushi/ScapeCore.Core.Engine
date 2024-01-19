@@ -28,32 +28,27 @@ namespace ScapeCore.Core.Engine.Components
         public RectTransform rtransform;
         public SpriteEffects spriteEffects;
         public float depth;
-        public SpriteBatch? spriteBatch;
 
-        public SpriteRenderer() : base(nameof(SpriteRenderer)) { }
-        public SpriteRenderer(SpriteBatch spriteBatch, RenderBatchEventHandler render, GraphicsDevice device) : base(render, device, new StringBuilder(nameof(SpriteRenderer)))
+        public SpriteRenderer() : base(nameof(SpriteRenderer))
         {
-            this.spriteBatch = spriteBatch;
             rtransform = new();
             depth = 0f;
         }
-        public SpriteRenderer(SpriteBatch spriteBatch, RenderBatchEventHandler render, GraphicsDevice device, Texture2D texture) : base(render, device, texture)
+        public SpriteRenderer(Texture2D texture) : base(texture)
         {
             var size = new Point(texture.Width, texture.Height);
             var center = Point.Zero;
             rtransform = new RectTransform(size, center, Vector2.Zero, Vector2.Zero, Vector2.One);
             depth = 0f;
-            this.spriteBatch = spriteBatch;
         }
-        public SpriteRenderer(SpriteBatch spriteBatch, RenderBatchEventHandler render, GraphicsDevice device, Texture2D texture, RectTransform rtransform, SpriteEffects spriteEffects, float depth) : base(render, device, texture)
+        public SpriteRenderer(Texture2D texture, RectTransform rtransform, SpriteEffects spriteEffects, float depth) : base(texture)
         {
             this.rtransform = rtransform;
             this.spriteEffects = spriteEffects;
             this.depth = depth;
-            this.spriteBatch = spriteBatch;
         }
 
-        protected override void Render() => spriteBatch.Draw(texture ?? new(device, texture!.Width, texture!.Height),
+        protected override void Render() => game?.SpriteBatch?.Draw(texture ?? new(game.GraphicsDevice, texture!.Width, texture!.Height),
                                                                 transform?.Position ?? Vector2.Zero,
                                                                 rtransform?.Rectangle ?? new Rectangle(Point.Zero, new(100, 100)),
                                                                 Color.White,

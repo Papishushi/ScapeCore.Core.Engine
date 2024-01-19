@@ -15,6 +15,8 @@
  * It is the base class for all attacheable behaviours used on ScapeCore.
  */
 
+using Microsoft.Xna.Framework;
+using ScapeCore.Core.Targets;
 using System;
 
 namespace ScapeCore.Core.Engine
@@ -31,10 +33,13 @@ namespace ScapeCore.Core.Engine
         public Guid Id { get => _id; }
         public bool IsActive { get => _isActive; }
         public bool IsDestroyed { get => _isDestroyed; }
+        public LLAM? game;
 
         ~Behaviour() => Destroy();
         public Behaviour()
         {
+            LLAM.Instance.TryGetTarget(out var target);
+            game = target;
             _isActive = true;
             _isDestroyed = false;
             OnCreate();
@@ -55,6 +60,7 @@ namespace ScapeCore.Core.Engine
             if (_isDestroyed) return;
             _isActive = false;
             OnDestroy();
+            game = null;
             _isDestroyed = true;
         }
 
