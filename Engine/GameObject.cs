@@ -265,7 +265,7 @@ namespace ScapeCore.Core.Engine
 
         protected override void OnCreate()
         {
-            throw new NotImplementedException();
+
         }
     }
 }
