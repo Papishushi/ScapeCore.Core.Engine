@@ -22,16 +22,30 @@ using Baksteen.Extensions.DeepCopy;
 using Microsoft.Xna.Framework;
 using ScapeCore.Core.Batching.Events;
 using ScapeCore.Core.Engine.Components;
-using System.Linq;
+using ScapeCore.Core.Targets;
+using System.Threading.Tasks;
 
 namespace ScapeCore.Core.Engine
 {
+    /// <summary>
+    /// This is the base class for any custom updateable <see cref="Behaviour"/>. Implements <see cref="IEntityComponentModel"/>.
+    /// </summary>
     public abstract class MonoBehaviour : Behaviour, IEntityComponentModel
     {
         private bool _started = false;
         private GameTime? _time;
+        /// <summary>
+        /// The current <see cref="GameTime"/> or <see langword="null"/> if the first <see cref="Update"/> cycle has not been invoked yet.
+        /// </summary>
         public GameTime? Time { get => _time; }
+        /// <summary>
+        /// The <see cref="GameObject"/> of this entity.
+        /// </summary>
         public GameObject? gameObject { get; set; }
+        /// <summary>
+        /// The <see cref="Transform"/> of this entity or <see langword="null"/> if <see cref="gameObject"/> is <see langword="null"/>.
+        /// This is the same as: <code> <see cref="gameObject"/>?.transform</code>
+        /// </summary>
         public Transform? transform { get => gameObject?.transform; }
 
         public MonoBehaviour() : base(nameof(MonoBehaviour)) => gameObject = new(this);
@@ -42,14 +56,25 @@ namespace ScapeCore.Core.Engine
 
         protected override void OnCreate()
         {
+            //Any MonoBehaviour has the capacity to initialize a new LLAM if it has not been created.
+            if (game == null && !LLAM.Instance.TryGetTarget(out game))
+            {
+                using var llam = new LLAM();
+                game = llam;
+            }
+
             game.OnStart += StartWrapper;
             game.OnUpdate += UpdateWrapper;
         }
 
         protected override void OnDestroy()
         {
-            game.OnStart -= StartWrapper;
-            game.OnUpdate -= UpdateWrapper;
+            if (game != null)
+            {
+                game.OnStart -= StartWrapper;
+                game.OnUpdate -= UpdateWrapper;
+            }
+
             gameObject = null;
         }
 

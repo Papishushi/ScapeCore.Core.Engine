@@ -22,10 +22,13 @@ using ScapeCore.Core.Batching.Events;
 using ScapeCore.Core.Batching.Resources;
 using ScapeCore.Core.Batching.Tools;
 using ScapeCore.Core.Targets;
-using Serilog;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+
+using static ScapeCore.Traceability.Debug.Debugger;
+using static ScapeCore.Traceability.Logging.LoggingColor;
 
 namespace ScapeCore.Core.Engine
 {
@@ -46,7 +49,7 @@ namespace ScapeCore.Core.Engine
 
         private static void LoadAllReferencedResources(object source, LoadBatchEventArgs args)
         {
-            Log.Debug($"{source.GetHashCode()} {args.GetInfo()}");
+            SCLog.Log(DEBUG, $"{source.GetHashCode()} {args.GetInfo()}");
 
             foreach (var type in ReflectiveEnumerator.GetEnumerableOfType<MonoBehaviour>())
             {
@@ -61,16 +64,16 @@ namespace ScapeCore.Core.Engine
                         {
                             var method = typeof(ContentManager).GetMethod(nameof(_game.Content.Load));
                             method = method?.MakeGenericMethod(info.TargetType);
-                            var result = method?.Invoke(_game.Content, new object[1] { info.ResourceName });
+                            var result = method?.Invoke(_game?.Content, new object[1] { info.ResourceName });
                             if (result == null)
                             {
-                                Log.Error("Resource Manager encountered an error while loading a resource. Resource load returned {null}.", null);
+                                SCLog.Log(ERROR, $"Resource Manager encountered an error while loading a resource. Resource load returned {Yellow}null{default}.");
                                 continue;
                             }
                             var obj = Convert.ChangeType(result, info.TargetType);
                             if (obj == null)
                             {
-                                Log.Error("Resource Manager encountered an error while loading a resource. Loaded resource wasnt succesfully chaged to type {t} and returned null.", info.TargetType);
+                                SCLog.Log(ERROR, $"Resource Manager encountered an error while loading a resource. Loaded resource wasnt successfully changed to type {info.TargetType} and returned null.");
                                 continue;
                             }
                             dynamic changedObject = obj;
@@ -81,7 +84,11 @@ namespace ScapeCore.Core.Engine
             }
 
             foreach (var dependency in _tree.Dependencies)
-                Log.Debug($"{string.Join(',', dependency.Value.dependencies)} types loaded resource {{{dependency.Key.ResourceName}}} of type {{{dependency.Key.TargetType}}}");
+            {
+                var msg = $"{string.Join(',', dependency.Value.dependencies)} types loaded resource {dependency.Key.ResourceName} of type {dependency.Key.TargetType}";
+                SCLog.Log(DEBUG, msg);
+            }
+
         }
     }
 }
