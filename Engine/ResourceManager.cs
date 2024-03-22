@@ -20,34 +20,42 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using ScapeCore.Core.Batching.Events;
 using ScapeCore.Core.Batching.Resources;
-using ScapeCore.Core.Batching.Tools;
+using ScapeCore.Core.Tools;
 using ScapeCore.Core.Targets;
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-using static ScapeCore.Traceability.Debug.Debugger;
+using static ScapeCore.Core.Debug.Debugger;
 using static ScapeCore.Traceability.Logging.LoggingColor;
+using System.Collections.Generic;
+using ScapeCore.Core.Serialization;
 
 namespace ScapeCore.Core.Engine
 {
-    public static class ResourceManager
+    public class ResourceManager : IScapeCoreManager
     {
-        private static readonly ResourceDependencyTree _tree = new();
-        public static ResourceDependencyTree Content { get => _tree; }
-        private static LLAM? _game;
+        private static ResourceManager? _defaultManager = null;
+        public static ResourceManager? Default { get => _defaultManager; set => _defaultManager = value; }
 
-        static ResourceManager()
+        private readonly ResourceDependencyTree _tree = new();
+        public ResourceDependencyTree Content { get => _tree; }
+        List<IScapeCoreService?> IScapeCoreManager.Services { get => throw new NotImplementedException(); }
+
+        private LLAM? _game;
+
+        public ResourceManager()
         {
             LLAM.Instance.TryGetTarget(out var target);
             _game = target;
             _game!.OnLoad += LoadAllReferencedResources;
+            _defaultManager ??=this;
         }
 
-        public static StrongBox<T?> GetResource<T>(string key) => new(new DeeplyMutable<T>(_tree.Dependencies[new(key, typeof(T))].resource).Value);
+        public StrongBox<T?> GetResource<T>(string key) => new(new DeeplyMutable<T>(_tree.Dependencies[new(key, typeof(T))].resource).Value);
 
-        private static void LoadAllReferencedResources(object source, LoadBatchEventArgs args)
+        private void LoadAllReferencedResources(object source, LoadBatchEventArgs args)
         {
             SCLog.Log(DEBUG, $"{source.GetHashCode()} {args.GetInfo()}");
 
@@ -89,6 +97,11 @@ namespace ScapeCore.Core.Engine
                 SCLog.Log(DEBUG, msg);
             }
 
+        }
+
+        bool IScapeCoreManager.InjectDependencies(params IScapeCoreService[] services)
+        {
+            throw new NotImplementedException();
         }
     }
 }

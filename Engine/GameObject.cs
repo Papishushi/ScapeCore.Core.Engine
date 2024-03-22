@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-using static ScapeCore.Traceability.Debug.Debugger;
+using static ScapeCore.Core.Debug.Debugger;
 using static ScapeCore.Traceability.Logging.LoggingColor;
 
 namespace ScapeCore.Core.Engine
