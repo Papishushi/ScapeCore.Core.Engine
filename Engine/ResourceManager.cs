@@ -31,6 +31,7 @@ using static ScapeCore.Core.Debug.Debugger;
 using static ScapeCore.Traceability.Logging.LoggingColor;
 using System.Collections.Generic;
 using ScapeCore.Core.Serialization;
+using ScapeCore.Core.SceneManagement;
 
 namespace ScapeCore.Core.Engine
 {
@@ -103,5 +104,16 @@ namespace ScapeCore.Core.Engine
         {
             throw new NotImplementedException();
         }
+
+        bool IScapeCoreManager.ExtractDependencies(params IScapeCoreService[] services)
+        {
+            var result = true;
+            if (result == false)
+                throw new ArgumentException($"The dependencies extracted from this {nameof(ResourceManager)} are not valid. Check if they are correct and try again.");
+            else
+                SCLog.Log(DEBUG, $"Dependencies were succesfully extracted from {nameof(ResourceManager)}.");
+            return result;
+        }
+
     }
 }
