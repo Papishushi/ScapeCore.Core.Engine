@@ -48,10 +48,15 @@ namespace ScapeCore.Core.Engine
 
         public ResourceManager()
         {
-            LLAM.Instance.TryGetTarget(out var target);
-            _game = target;
-            _game!.OnLoad += LoadAllReferencedResources;
-            _defaultManager ??=this;
+            if (LLAM.Instance.TryGetTarget(out var target))
+            {
+                _game = target;
+                _game!.OnLoad += LoadAllReferencedResources;
+                _defaultManager ??=this;
+            }
+            else
+                SCLog?.Log(ERROR, $"Resource Manager encountered an error. LLAM could not retrieve instance {Yellow}null{default}.");
+
         }
 
         public StrongBox<T?> GetResource<T>(string key) => new(new DeeplyMutable<T>(_tree.Dependencies[new(key, typeof(T))].resource).Value);
