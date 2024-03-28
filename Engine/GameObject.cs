@@ -17,6 +17,7 @@
  */
 
 using ScapeCore.Core.Engine.Components;
+using ScapeCore.Traceability.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -57,6 +58,8 @@ namespace ScapeCore.Core.Engine
         /// </summary>
         public readonly List<GameObject> children = new();
 
+        public ImmutableList<Behaviour> Behaviours => behaviours.ToImmutableList();
+
         /// <summary>
         /// Creates a new <see cref="GameObject"/> instance.
         /// </summary>
@@ -86,21 +89,15 @@ namespace ScapeCore.Core.Engine
         /// Creates a new <see cref="GameObject"/> instance with the specified <see cref="Behaviour">Behaviours</see>.
         /// </summary>
         /// <param name="behaviours">The <see cref="Behaviour">Behaviours</see> to be attached to this <see cref="GameObject"/>.</param>
-        public GameObject(params Behaviour[] behaviours) : this()
-        {
-            foreach (Behaviour behaviour in behaviours)
-                this.behaviours.Add(behaviour);
-        }
+        public GameObject(params Behaviour[] behaviours) : this() => AddBehaviours(behaviours);
+
         /// <summary>
         /// Creates a new <see cref="GameObject"/> instance with the specified name and <see cref="Behaviour">Behaviours</see>.
         /// </summary>
         /// <param name="name">The name of the <see cref="GameObject"/>.</param>
         /// <param name="behaviours">The <see cref="Behaviour">Behaviours</see> to be attached to this <see cref="GameObject"/>.</param>
-        public GameObject(string name, params Behaviour[] behaviours) : this(name)
-        {
-            foreach (Behaviour behaviour in behaviours)
-                this.behaviours.Add(behaviour);
-        }
+        public GameObject(string name, params Behaviour[] behaviours) : this(name) => AddBehaviours(behaviours);
+
         /// <summary>
         /// Throws a  <see cref="ArgumentNullException"/> if <see cref="behaviours"/> is null.
         /// </summary>
@@ -124,7 +121,7 @@ namespace ScapeCore.Core.Engine
             catch (NullReferenceException nRE)
             {
                 var msg = $"Failed to add behaviour on GameObject {name} {{{Id}}}\t{nRE.Message}";
-                SCLog.Log(ERROR, msg);
+                SCLog?.Log(ERROR, Red + msg + LoggingColor.Default);
                 throw new ArgumentNullException(msg);
             }
             foreach (Behaviour behaviour in behaviours)
@@ -137,7 +134,7 @@ namespace ScapeCore.Core.Engine
         /// <typeparam name="T">The type to search for.</typeparam>
         /// <returns>All <see cref="Behaviour">Behaviours</see> of type <typeparamref name="T"/> to be found.</returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public IEnumerator<T> GetBehaviours<T>() where T : Behaviour
+        public IEnumerable<T> GetBehaviours<T>() where T : Behaviour
         {
             try
             {
@@ -146,10 +143,10 @@ namespace ScapeCore.Core.Engine
             catch (NullReferenceException nRE)
             {
                 var msg = $"Failed to add behaviour on GameObject {name} {{{Id}}}\t{nRE.Message}";
-                SCLog.Log(ERROR, msg);
+                SCLog?.Log(ERROR, Red + msg + LoggingColor.Default);
                 throw new ArgumentNullException(msg);
             }
-            return behaviours.Where(x => x.GetType() == typeof(T)).Cast<T>().GetEnumerator();
+            return behaviours.Where(x => x.GetType() is T).Cast<T>();
         }
 
         /// <summary>
@@ -167,7 +164,7 @@ namespace ScapeCore.Core.Engine
             catch (NullReferenceException nRE)
             {
                 var msg = $"Failed to add behaviour on GameObject {name} {{{Id}}}\t{nRE.Message}";
-                SCLog.Log(ERROR, msg);
+                SCLog?.Log(ERROR, Red + msg + LoggingColor.Default);
                 throw new ArgumentNullException(msg);
             }
             var temp = new T();
@@ -192,13 +189,13 @@ namespace ScapeCore.Core.Engine
             catch (NullReferenceException nRE)
             {
                 var msg = $"Failed to add behaviour on GameObject {name} {{{Id}}}\t{nRE.Message}";
-                SCLog.Log(ERROR, msg);
+                SCLog?.Log(ERROR, Red + msg + LoggingColor.Default);
                 throw new ArgumentNullException(msg);
             }
             if (behaviour == null) return null;
             behaviours.Add(behaviour);
             if (typeof(IEntityComponentModel).IsAssignableFrom(behaviour.GetType()))
-                ((IEntityComponentModel)behaviour).gameObject = this;
+                ((IEntityComponentModel) behaviour).gameObject = this;
             return behaviour;
         }
 
@@ -218,7 +215,7 @@ namespace ScapeCore.Core.Engine
             catch (NullReferenceException nRE)
             {
                 var msg = $"Failed to add behaviour on GameObject {name} {{{Id}}}\t{nRE.Message}";
-                SCLog.Log(ERROR, msg);
+                SCLog?.Log(ERROR, Red + msg + LoggingColor.Default);
                 throw new ArgumentNullException(msg);
             }
             if (behaviours == null) return null;
@@ -249,7 +246,7 @@ namespace ScapeCore.Core.Engine
             catch (NullReferenceException nRE)
             {
                 var msg = $"Failed to remove behaviour on GameObject {name} {{{Id}}}\t{nRE.Message}";
-                SCLog.Log(ERROR, msg);
+                SCLog?.Log(ERROR, Red + msg + LoggingColor.Default);
                 throw new ArgumentNullException(msg);
             }
             T? temp = behaviours.Find(x => x.GetType() == typeof(T))?.To<T>();
@@ -275,7 +272,7 @@ namespace ScapeCore.Core.Engine
             catch (NullReferenceException nRE)
             {
                 var msg = $"Failed to remove behaviour on GameObject {name} {{{Id}}}\t{nRE.Message}";
-                SCLog.Log(ERROR, msg);
+                SCLog?.Log(ERROR, Red + msg + LoggingColor.Default);
                 throw new ArgumentNullException(msg);
             }
             if (behaviour == null) return null;
@@ -300,7 +297,7 @@ namespace ScapeCore.Core.Engine
             catch (NullReferenceException nRE)
             {
                 var msg = $"Failed to remove behaviour on GameObject {name} {{{Id}}}\t{nRE.Message}";
-                SCLog.Log(ERROR, msg);
+                SCLog?.Log(ERROR, Red + msg + LoggingColor.Default);
                 throw new ArgumentNullException(msg);
             }
             var l = new List<T>();
@@ -330,7 +327,7 @@ namespace ScapeCore.Core.Engine
             catch (NullReferenceException nRE)
             {
                 var msg = $"Failed to remove behaviour on GameObject {name} {{{Id}}}\t{nRE.Message}";
-                SCLog.Log(ERROR, msg);
+                SCLog?.Log(ERROR, Red + msg + LoggingColor.Default);
                 throw new ArgumentNullException(msg);
             }
             var l = new List<T>();
