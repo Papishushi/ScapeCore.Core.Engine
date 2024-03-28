@@ -28,7 +28,7 @@ namespace ScapeCore.Core.Engine
     /// </remarks>
     public abstract class Behaviour
     {
-        private readonly Guid _id = new();
+        private readonly Guid _id = Guid.NewGuid();
 
         private bool _isActive;
         private bool _isDestroyed;
